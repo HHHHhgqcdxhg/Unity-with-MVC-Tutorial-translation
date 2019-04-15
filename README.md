@@ -213,7 +213,7 @@ public class BallView : BounceElement
 // 控制应用工作流程.
 public class BounceController : BounceElement
 {
-   // 处理Ball的碰撞函数
+   // 处理Ball的碰撞事件
    public void OnBallGroundHit()
    {
       app.model.bounces++;
@@ -311,4 +311,146 @@ public class BallView : BounceElement
 }
 ```
 
+```C#
+// BounceController.cs
+
+// 控制应用工作流程.
+public class BounceController : BounceElement
+{
+   // 处理Ball的碰撞事件
+   public void OnNotification(string p_event_path,Object p_target,params object[] p_data)
+   {
+      switch(p_event_path)
+      {
+         case BounceNotification.BallHitGround:
+            app.model.bounces++;
+            Debug.Log("Bounce " + app.model.bounces);
+            if(app.model.bounces >= app.model.winCondition)
+            {
+               app.view.ball.enabled = false;
+               app.view.ball.GetComponent<RigidBody>().isKinematic=true; // 使ball停下
+               // 通知自身,说不定有其他其他controller响应
+               app.Notify(BounceNotification.GameComplete,this);            
+            }
+         break;
+         
+         case BounceNotification.GameComplete:
+            Debug.Log(“Victory!!”);
+         break;
+      } 
+   }
+}
 ```
+
+大项目将会由很多通知.所以为了避免一个庞大的switch-case结构,可以创建不同的controller来处理不同范围的消息.  
+
+## 实际项目中的AMVCC
+上面的例子展示了一个AMVCC模式的应用场合.为了使你的思维方式能符合MVC的三个元素,而且按一个有序的层级展示entity应该明确这种技能.  
+
+在大项目中,开发者需要面对更多的复杂的场景,并且不好的决定一些事物是该放到View层还是Controller层,或者遇到一个给定的class需要更加彻底地分散到更小的模块.  
+
+### 翻阅的规则 (by Eduardo)
+并不存在什么"普遍的MVC整理规则".但是有一些简单的规则,我遵守它们来帮我决定一些事物是Model,View,Controller,还是需要分解成更小的模块.
+
+#### Class分类
+##### Model
+- 包含一个应用的核心数据或状态,比如player的<code>health</code>,或是抢的<code>ammo</code>(弹药)  
+- 序列化的,并行的,和/或这两种的变种  
+- 加载/保存数据(本地或者网络)  
+- 在运行中通知Controller  
+- 为游戏的[有限状态机](https://gamedevelopment.tutsplus.com/tutorials/finite-state-machines-theory-and-implementation--gamedev-11867)保存游戏状态  
+- 不会接触到Views  
+
+##### View
+- 从Model层中获取数据来为用户展示实时的游戏状态.比如,一个View层的方法<code>player.Run()</code>会在内部调用<code>model.speed</code>显示player的行为  
+- 不会改动Model层
+- 严格的实现自身类的功能.比如:  
+   - 一个<code>PlayerView</code>不应该实现输入检测或更改游戏状态  
+   - 一个View应该表现得像是有通知重要事件的接口的黑盒子
+   - 不存储核心数据(比如速度,血量,...)  
+
+##### Controller
+- 不存储核心数据
+- 会过滤掉 不希望有的View 发来的通知  
+- 更新和使用Model的数据  
+- 管理Unity的场景的工作流
+
+#### Class层级
+既然这样,我不需要遵守太多的步骤.通常,当我需要给变量名加太多的"前缀"时,我就会意识到需要把类分解,或同个元素有太多的变种(如MMO游戏中的<code>Player</code>类或FPS游戏中的<code>Gun</code>类).  
+
+比如,一个单个的包含了Player数据的<code>Model</code>会有很多<code>playerDataA, playerDataB,...</code>;  
+一个处理Player通知的<code>Controller</code>会有很多<code>OnPlayerDidA,OnPlayerDidB,...</code>.  
+我们想要减小代码体积并且去掉<code>player</code>和<code>OnPlayer</code>前缀.  
+
+因为只用数据理解起来很简单,所以我们用一个<code>Model</code>类来做例子.  
+
+在写代码时,我通常先用一个单个的<code>Model</code>类包含游戏中的所有数据.  
+
+```C#
+// Model.cs
+
+class Model
+{
+   public float playerHealth;
+   public int playerLives;
+
+   public GameObject playerGunPrefabA;
+   public int playerGunAmmoA;
+
+   public GameObject playerGunPrefabB;
+   public int playerGunAmmoB;
+
+   // Ops Gun[C D E ...] will appear...
+   /* ... */
+
+   public float gameSpeed;
+   public int gameLevel;
+}
+```
+
+很容易看出,游戏越复杂,变量数会更多.当它够复杂时,我们可能会以一个庞大的包含了<code>model.playerABCDFoo</code>的类来告终.嵌套的元素会简化代码完成,并且使数据有变种的空间.  
+
+```C#
+// Model.cs
+
+class Model
+{
+   public PlayerModel player;  // Player数据的容器
+   public GameModel game;      // Game数据的容器
+}
+```
+
+```C#
+// GameModel.cs
+
+class GameModel
+{
+   public float speed;         // 游戏运行速度 (影响游戏难度)
+   public int level;           // 当前载入的游戏关卡/阶段
+}
+```
+
+```C#
+// PlayerModel.cs
+
+class PlayerModel
+{
+   public float health;        // Player 血量 (在0.0 和 1.0之间)
+   public int lives;           // Player 死后"retry"的次数.
+   public GunModel[] guns;     // 当前Player在游戏中可切换的枪的数组
+}
+```
+
+```C#
+// GunModel.cs
+
+class GunModel
+{
+   public GunType type;        // 列举枪的类型
+   public GameObject prefab;   // 枪的3D Asset模板
+   public int ammo;            // 当前子弹数
+   public int clips;           // 可能的再装填弹药的次数
+}
+```
+
+有了这些类的配置,开发者可以在某时直观地操纵源码中的一个概念.让我们假设一个FPS游戏.
