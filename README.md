@@ -453,4 +453,21 @@ class GunModel
 }
 ```
 
-有了这些类的配置,开发者可以在某时直观地操纵源码中的一个概念.让我们假设一个FPS游戏.
+有了这些类的配置,开发者可以在某时直观地操纵源码中的一个概念.让我们假设一个武器和它们的配置非常多的FPS游戏.<code>GunModel</code>实际上被包含在一个类中,这个类也可以从一系列Prefabs中为各个种类创建实例并将其存储起来方便以后用到.  
+
+相比之下,如果所有的枪的信息都包含在一个单独的<code>GunModel</code>中,如<code>gun0Ammo</code>,<code>gun1Ammo</code>,<code>gun0Clips</code>等等,然后当用户需要存储<code>Gun</code>数据的时候,将要需要存储整个<code>Model</code>,即便它还包含了不需要的<code>Player</code>数据.在这种情况下,很明显用一个新的<code>GunModel</code>类会比较好.  
+![Improving the class hierarchy.](https://pic.ggemo.com/picgo/20190415172440.png)  
+
+就像所有事物都会有优缺点一样.有时人会不必要地过分划分并且增加代码复杂度.只有经验能磨炼你的为你的项目寻找MVC分类的技能.  
+
+> 解锁新的游戏开发特殊能力: 在Unity游戏中使用MVC模式
+
+## 结论
+除此之外还有大量的软件设计模式.在这篇文章中,我尝试着展示了在过去的项目中对我帮助最大的一个.开发者应该一直在吸收新的知识的同时一直保持怀疑.我希望这篇教程能帮助你学习新的东西,并与此同时,成为一个你形成自己的开发风格的跳板.  
+
+同时,我真的希望你去多多查找其他的模式来找到最适合你的那个.一个好的出发点是[这篇wikipedia文章](https://en.wikipedia.org/wiki/Software_design_pattern),里面有出色的模式列表和他们的特征.  
+
+如果你喜欢**AMVCC**模式并且想要尝试它,不要忘了尝试下我的库,[<strong>*Unity MVC*</strong>](https://bitbucket.org/eduardo_costa/thelab-unity-mvc/overview),这里包含了所有的,创建AMVCC应用的核心类.  
+
+## 关于作者
+[https://www.toptal.com/resume/eduardo-dias-da-costa](https://www.toptal.com/resume/eduardo-dias-da-costa)
