@@ -470,4 +470,7 @@ class GunModel
 如果你喜欢**AMVCC**模式并且想要尝试它,不要忘了尝试下我的库,[<strong>*Unity MVC*</strong>](https://bitbucket.org/eduardo_costa/thelab-unity-mvc/overview),这里包含了所有的,创建AMVCC应用的核心类.  
 
 ## 关于作者
-[https://www.toptal.com/resume/eduardo-dias-da-costa](https://www.toptal.com/resume/eduardo-dias-da-costa)
+[https://www.toptal.com/resume/eduardo-dias-da-costa](https://www.toptal.com/resume/eduardo-dias-da-costa)  
+
+## 关于译者
+[https://blog.purecucumber.club/](https://blog.purecucumber.club/)
