@@ -5,7 +5,8 @@
 自己翻译下,功力尚浅望轻喷.(页面最下面有评论板块)  
 原文地址: [https://www.toptal.com/unity-unity3d/unity-with-mvc-how-to-level-up-your-game-development](https://www.toptal.com/unity-unity3d/unity-with-mvc-how-to-level-up-your-game-development)  
 
-<code>(以括号开头和结尾的代码块为译者的注释和吐槽)</code>
+<code>(以括号开头和结尾的代码块为译者的注释和吐槽,比如这行和下面一行)</code>  
+<code>(这个标题说是MVC,实际上讲的是MVC的一个变种: AMVCC模式)</code>
   
 程序猿经常从经典的<code>Hello World</code>着手开始学习.从那开始,项目越做越大.每个新挑战都指向一个重要的课题:  
 
@@ -53,7 +54,7 @@ EC在缓解多重继承的问题方面是一个好的模式,当一个复杂的�
 
 因为在游戏开发中继承应用很广泛,所以这种问题会很常见.  
 
-通过分解小的Component的属性和数据操作器,可以使他们可以附加在不同的Entitiy上并重用,而不用依赖于复杂的继承关系(which, by the way, isn’t even a feature of C# or Javascript, the main languages used by Unity).  
+通过分解小的Component的属性和数据操作器,可以使他们可以附加在不同的Entitiy上并重用,而不用依赖于复杂的继承关系(顺便,这不只是C#或JavaScript,Unity常用的语言的特征).  
 
 ### Entity-Component模式的不足
 EC在OOP之上的一个层面,EC有利于整理和更好的组织你的代码架构.然而,在大项目中,我们仍然"太过随意"然后我们会发现自己身处一个"属性海洋",可能会费一段艰苦的时光来找到对的Entity和Component,或搞清楚它们应该如何相互影响.一个给定的任务中会有无穷种Entity和Component的组合方式.  
@@ -76,7 +77,6 @@ EC在OOP之上的一个层面,EC有利于整理和更好的组织你的代码架
 
 ## Unity和EC
 让我们仔细看看unity预先给我们了什么.  
-
 Unity是一个建立在EC上的开发平台,所有的Entity都是<code>GameObject</code>的实例,它们的属性可以使他们"可见","可移动","可交互",等等,都是由继承<code>Component</code>的类提供的.  
 
 Unity editor的**Hierarchy面板**和**Inspector面板**提供了装配你的应用的强大的方法,用比通常情况下更少的代码来附加组件,配置它们的初始化状态和引导你的游戏.  
@@ -108,7 +108,7 @@ Unity editor的**Hierarchy面板**和**Inspector面板**提供了装配你的应
     可复用的,小的,容易被包含的脚本
 
 ## 例子: 10 Bounces
-作为一个简单的例子,让我们来看下一个简单的叫<strong>_10 Bounces_</strong>的游戏,在此我会使用AMVCC模式的核心要素.  
+作为一个简单的例子,让我们来看下一个简单的叫<strong>_10 Bounces_</strong>的游戏,在此我会使用AMVCC模式的核心要素  
 
 这个游戏的结构很简单: 一个带有一个<code>SphereCollider</code>和一个<code>Rigidbody</code>的<code>Ball</code>(将会在"Play"之后开始下落),一个当做地面的<code>Cube</code>和5个搭建AMVCC的脚本.  
 
@@ -133,13 +133,13 @@ Unity editor的**Hierarchy面板**和**Inspector面板**提供了装配你的应
 
 ### 写脚本
 
-> **注意**:下面的脚本都是实际项目的实现的抽象版本.一个详细的实现对渲染不太好.然而,如果你想浏览更多,[点击这里](https://bitbucket.org/eduardo_costa/thelab-unity-mvc/overview)查看我的个人的Unity MVC框架,*Unity MVC*.你可以找到大多数应用需要的实现AMVCC结构框架需要的核心class.
+> **注意**:下面的脚本都是真实世界的实现的抽象版本.一个详细的实现对渲染不太好.然而,如果你想浏览更多,[点击这里](https://bitbucket.org/eduardo_costa/thelab-unity-mvc/overview)查看我的个人的Unity MVC框架,*Unity MVC*.你可以找到大多数应用需要的实现AMVCC结构框架需要的核心class.
 
 让我们来看一下构成*10 Bounces*的脚本的结构.  
 
 在开始之前,因为和常见的Unity的工作流程不同,让我们先简略地阐明脚本和GameObjects是如何共同工作的.在Unity中,"组件",在Entity-Component的概念中,由<code>MonoBehaviour</code>类表现.一个组件要在运行时存在,开发者需要将其拖拽入一个GameObject(在Entity-Component模式中的"Entity")或者用<code>AddComponent<YourMonobehaviour>()</code>命令.在此之后,脚本就会被实例化并且准备好在执行时使用.  
 
-首先,我们定义<code>Application</code>类(AMVCC中的"A"),作为主要的类,包含所有实例化的游戏元素的引用.我们也可以创建一个辅助的基类叫<code>Element</code>,让我们能拿到Application实例和他的子元素的MVC实例.  
+首先,我们定义<code>Application</code>类(AMVCC中的"A"),作为主要的类,包含所有实例化的游戏元素的引用.我们也可以创建一个辅助的基类叫<code>Element</code>,让我们能拿到Application实例和他的子元素的MVC实例.<code>(子元素的MVC实例是什么鬼啊晕了晕了)</code>  
 
 考虑到这一点,让我们开始定义<code>Application</code>类(AMVCC中的"A"),将要包含一个独特的实例.在它里面,三个变量<code>model</code>,<code>view</code>,和<code>controller</code>,将在运行时给我么提供所有的MVC实例的接入点.这些变量需要是包含 想要的脚本的<code>public</code>引用的<code>MonoBehaviour</code>.  
 
@@ -286,16 +286,18 @@ class BounceApplication
 // 这个类将所有的事件名定义为static.
 class BounceNotification
 {
-   static public string BallHitGround = "ball.hit.ground";
-   static public string GameComplete  = "game.complete";
+   public const string BallHitGround = "ball.hit.ground";
+   public const string GameComplete  = "game.complete";
    /* ...  */
-   static public string GameStart     = "game.start";
-   static public string SceneLoad     = "scene.load";
+   public const string GameStart     = "game.start";
+   public const string SceneLoad     = "scene.load";
    /* ... */
 }
 ```
 
-显而易见,通过这种方式,程序的可读性增加了,因为开发者不需要在所有的源码中找<code>controller.OnSomethingComplexName</code>方法来理解运行时会产生什么样的动作.只需查看一个文件,就可以理解这个应用的所有行为.  
+<code>(上面代码块中的"const"原文中皆为static,按原文写编译出错)</code>
+
+显而易见,通过这种方式,程序的可读性增加了,因为开发者不需要在所有的源码中找<code>controller.OnSomethingComplexName</code>方法来理解运行时会产生什么样的行为.只需查看一个文件,就可以理解这个应用的所有行为.  
 
 现在,我们只需要改变<code>BallView</code>和<code>BounceController</code>来适应这种新系统:  
 
@@ -345,17 +347,17 @@ public class BounceController : BounceElement
 大项目将会由很多通知.所以为了避免一个庞大的switch-case结构,可以创建不同的controller来处理不同范围的消息.  
 
 ## 实际项目中的AMVCC
-上面的例子展示了一个AMVCC模式的应用场合.为了使你的思维方式能符合MVC的三个元素,而且应该学会按一个有序的层级展示entity.  
+上面的例子展示了一个AMVCC模式的应用场合.为了使你的思维方式能符合MVC的三个元素,而且按一个有序的层级展示entity应该明确这种技能.  
 
 在大项目中,开发者需要面对更多的复杂的场景,并且不好的决定一些事物是该放到View层还是Controller层,或者遇到一个给定的class需要更加彻底地分散到更小的模块.  
 
-### 经验法则 (by Eduardo)
+### 翻阅的规则 (by Eduardo)
 并不存在什么"普遍的MVC整理规则".但是有一些简单的规则,我遵守它们来帮我决定一些事物是Model,View,Controller,还是需要分解成更小的模块.
 
 #### Class的分类
 ##### Model
 - 包含一个应用的核心数据或状态,比如player的<code>health</code>,或是枪的<code>ammo</code>(弹药)  
-- 序列化的,反序列化的,和/或这两种的变种  
+- 序列化的,并行的,和/或这两种的变种  
 - 加载/保存数据(本地或者网络)  
 - 在运行中通知Controller  
 - 为游戏的[有限状态机](https://gamedevelopment.tutsplus.com/tutorials/finite-state-machines-theory-and-implementation--gamedev-11867)保存游戏状态  
@@ -371,12 +373,12 @@ public class BounceController : BounceElement
 
 ##### Controller
 - 不存储核心数据
-- 会过滤掉不期望的View发来的通知  
+- 会过滤掉 不希望有的View 发来的通知  
 - 更新和使用Model的数据  
 - 管理Unity的场景的工作流
 
 #### Class的层级
-在这方面,我不需要遵守太多的步骤.通常,当我需要给变量名加太多的"前缀"时,或同个元素有太多的变种(如MMO游戏中的<code>Player</code>类或FPS游戏中的<code>Gun</code>类)时,我就会意识到需要把类分解.  
+既然这样,我不需要遵守太多的步骤.通常,当我需要给变量名加太多的"前缀"时,我就会意识到需要把类分解,或同个元素有太多的变种(如MMO游戏中的<code>Player</code>类或FPS游戏中的<code>Gun</code>类).  
 
 比如,一个单个的包含了Player数据的<code>Model</code>会有很多<code>playerDataA, playerDataB,...</code>;  
 一个处理Player通知的<code>Controller</code>会有很多<code>OnPlayerDidA,OnPlayerDidB,...</code>.  
